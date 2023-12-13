@@ -1,0 +1,26 @@
+import sqlite3
+
+connection = sqlite3.connect('game.db')
+cursor1 = connection.cursor()
+
+cursor1.execute('CREATE TABLE Games (name_of_game TEXT, genre TEXT)')
+games_list = [
+    ('Resident Evil 4 REMAKE', 'horror'),
+    ('Resident Evil 2 REMAKE', 'horror'),
+    ('Resident Evil 3 REMAKE', 'horror'),
+    ('Resident Evil 5', 'horror'),
+    ('Resident Evil 6', 'horror'),
+    ('Resident EVil. biohazard', 'horror'),
+    ('Resident EVil VILLAGE', 'horror'),
+    ('The Quarry', 'horror'),
+    ('Tiny Bunny', 'horror'),
+    ('Mortal Kombat 1', 'action')
+]
+
+cursor1.executemany('insert into Games values (?, ?)', games_list)
+
+for row in cursor1.execute('select * from Games'):
+     print(row)
+
+connection.commit()
+connection.close()
