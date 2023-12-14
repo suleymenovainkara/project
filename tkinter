@@ -6,7 +6,6 @@ import pyglet
 from tkinter import messagebox
 import subprocess
 
-
 pyglet.font.add_file('C:/Users/Админ/OneDrive/Рабочий стол/тис+по/RandomRecipePicker-main/relationalDB_complete_project_WINDOWS/fonts/Ubuntu-Bold.ttf')
 pyglet.font.add_file('C:/Users/Админ/OneDrive/Рабочий стол/тис+по/RandomRecipePicker-main/relationalDB_complete_project_WINDOWS/fonts/Shanti-Regular.ttf')
 
@@ -64,16 +63,19 @@ def pre_process(table_name, table_records):
 
     return title, games
 
-def open_fnaf():
-
-    fnaf_path = r'C:/Users/Админ/Downloads/Five.Nights.at.Freddys.4.Incl.Halloween.Edition/Five.Nights.at.Freddys.4.Incl.Halloween.Edition/FiveNightsatFreddys4'
+def run_python_game():
+    python_path = "python"
+    game_path = r'C:/Users/Админ/PycharmProjects/pythonProject1/bm/pong.py'
 
     try:
-
-        subprocess.run(fnaf_path)
+        subprocess.run([python_path, game_path], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Произошла ошибка при запуске игры: {e}")
     except Exception as e:
+        print(f"Произошла неизвестная ошибка: {e}")
 
-        print(f"Произошла ошибка: {e}")
+
+
 
 current_username = ""
 
@@ -250,7 +252,7 @@ def check_credentials(username, hashed_password):
         print("Правильные данные. Переход на load_frame2.")
         load_frame2()
     else:
-        print("Неправильные данные. Можно добавить код для вывода сообщения об ошибке.")
+        print("Неправильные данные.")
 
 
 def load_frame2():
@@ -390,7 +392,7 @@ def load_frame4():
         font=('Ubuntu', 17),
         bg='pink',
         fg='black',
-        command=lambda: show_user_games('aniya'))
+        command=lambda: show_user_games('cat123'))
     button1.place(x=135, y=100)
 
     button2 = tk.Button(
@@ -424,10 +426,18 @@ def load_frame5():
     logo_widget.image = logo_img
     logo_widget.pack(side=tk.LEFT, anchor=tk.NW, padx=10, pady=10)
 
-    name_of_game_entry = tk.Entry(frame5, bg='RosyBrown1', width=30)
+    name_of_game_entry = tk.Entry(
+        frame5,
+        bg='RosyBrown1',
+        width=30)
     name_of_game_entry.place(x=60, y=100)
 
-    search_result_label = tk.Label(frame5, text='', font=('Shanti', 10), bg='lavender blush', fg='black')
+    search_result_label = tk.Label(
+        frame5,
+        text='',
+        font=('Shanti', 10),
+        bg='lavender blush',
+        fg='black')
     search_result_label.place(x=200, y=160)
 
     game_label = tk.Label(
@@ -468,8 +478,13 @@ def load_frame5():
         command=lambda: load_frame4())
     exit_button.place(x=50, y=470)
 
-    open_fnaf_button = tk.Button(frame5, text="Открыть FNAF", command=open_fnaf)
-    open_fnaf_button.pack()
+    open_pong_button = tk.Button(
+        frame5,
+        text="Pong",
+        font=('Ubuntu', 13),
+        bg='lavender blush',
+        command= lambda: run_python_game())
+    open_pong_button.place(x=400, y=92, width=100)
 
 
 def add_game_for_user(username, game_name):
@@ -487,20 +502,22 @@ def add_game_for_user(username, game_name):
             connect_games = sqlite3.connect('C:/Users/Админ/PycharmProjects/pythonProject1/bm/list_game.db')
             cursor_games = connect_games.cursor()
 
-            # Проверка наличия игры в базе данных перед добавлением
-            cursor_games.execute("SELECT name_of_game FROM Games WHERE user_id = ? AND name_of_game = ?;",
+            cursor_games.execute("SELECT name_of_game, COALESCE(price, 0) FROM Games WHERE user_id = ? AND name_of_game = ?;",
                                  (user_id[0], game_name))
             existing_game = cursor_games.fetchone()
 
             if existing_game is None:
+
+                cursor_games.execute("SELECT COALESCE(price, 0) FROM Games WHERE name_of_game = ?;", (game_name,))
+                game_price = cursor_games.fetchone()[0]
+
                 cursor_games.execute("INSERT INTO Games (user_id, name_of_game) VALUES (?, ?);",
                                      (user_id[0], game_name))
                 connect_games.commit()
-                tk.messagebox.showinfo("Success", f"The game {game_name} has been added for the user {username}.")
+                tk.messagebox.showinfo("Success",
+                                       f"The game {game_name} (Price: {game_price}) has been added for the user {username}.")
             else:
                 tk.messagebox.showerror("Error", f"The game {game_name} already exists for the user {username}.")
-        else:
-            tk.messagebox.showerror("Error", f"User {username} not found.")
 
     except sqlite3.Error as e:
         tk.messagebox.showerror("Error", f"Error while adding the game: {e}")
@@ -524,12 +541,11 @@ def show_add_game_window():
     add_game_button = tk.Button(
         add_game_window,
         text="Add Game",
-        command=lambda: add_game_for_user('aniya', game_name_entry.get())
+        command=lambda: add_game_for_user('cat123', game_name_entry.get())
     )
     add_game_button.pack()
 
 
-# Функция для отображения списка игр текущего пользователя
 def show_user_games(username):
     connect_users = None
     connect_games = None
@@ -545,11 +561,16 @@ def show_user_games(username):
             connect_games = sqlite3.connect('C:/Users/Админ/PycharmProjects/pythonProject1/bm/list_game.db')
             cursor_games = connect_games.cursor()
 
-            cursor_games.execute("SELECT name_of_game FROM Games WHERE user_id = ?;", (user_id[0],))
+            # Измененный запрос, включающий сумму потраченных денег
+            cursor_games.execute("SELECT name_of_game, COALESCE(price, 0) FROM Games WHERE user_id = ?;", (user_id[0],))
             user_games = cursor_games.fetchall()
 
-            game_list = "\n".join([game[0] for game in user_games])
-            tk.messagebox.showinfo("User Games", f"User {username}'s game list:\n{game_list}")
+            game_list = "\n".join([f"{game[0]} (Price: {game[1]})" for game in user_games])
+
+            # Рассчет суммы потраченных денег
+            total_spent = sum([game[1] for game in user_games])
+
+            tk.messagebox.showinfo("User Games", f"User {username}'s game list:\n{game_list}\n\nTotal spent: {total_spent}")
         else:
             tk.messagebox.showerror("Error", f"User {username} not found.")
     except sqlite3.Error as e:
@@ -595,12 +616,10 @@ def search_game(game_name, result_label):
         connect_list_game = sqlite3.connect('C:/Users/Админ/PycharmProjects/pythonProject1/bm/game.db')
         cursor_list_game = connect_list_game.cursor()
 
-        # Ищем игру в базе данных list_game с использованием LIKE
-        cursor_list_game.execute("SELECT name_of_game FROM Games WHERE name_of_game LIKE ?;", ('%' + game_name + '%',))
+        cursor_list_game.execute("SELECT name_of_game FROM Game WHERE name_of_game LIKE ?;", ('%' + game_name + '%',))
         result = cursor_list_game.fetchall()
 
         if result:
-            # Если есть результаты, формируем строку с найденными играми
             games_found = '\n'.join(game[0] for game in result)
             result_label.config(text=f'games containing "{game_name}":\n{games_found}')
         else:
@@ -610,7 +629,7 @@ def search_game(game_name, result_label):
     finally:
         connect_list_game.close()
 
-# initiallize app
+
 root = tk.Tk()
 root.title('Welcome to steam')
 root.eval('tk::PlaceWindow . center')
