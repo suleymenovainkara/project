@@ -1,0 +1,79 @@
+import sqlite3
+
+connection = sqlite3.connect('users.db')
+cursor1 = connection.cursor()
+
+cursor1.execute('CREATE TABLE users (user_id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE NOT NULL, password TEXT NOT NULL, age INT)')
+users_list = [
+    (101, 'SonicWarp', '123455', 18),
+    (102, 'FrostyFables', '123456', 15),
+    (103, 'QuantumQuiver', '123457', 15),
+    (104, 'ThunderSprint', '123458', 19),
+    (105, 'ShadowShifter', '123459', 32),
+    (106, 'MysticMomentum', '123454', 31),
+    (107, 'SolarShiver', '123453', 14),
+    (108, 'NebulaNexus', '123452', 17),
+    (109, 'BlazeBlossom', '123451', 14),
+    (110, 'LunarLoom', 'var123456', 21),
+    (111, 'CyberCipher', 'var123457', 23),
+    (112, 'VortexVerve', 'var123458', 24),
+    (113, 'EmberEcho', 'var123459', 22),
+    (114, 'NovaNebulous', 'var123455', 16),
+    (115, 'FireFlare', 'IceIgnition123', 15),
+    (116, 'StarlightStrider', 'var123454', 43),
+    (117, 'ElectricEmber', 'var123453', 33),
+    (118, 'RogueRadiance', 'var123452', 56),
+    (119, 'CosmicCascade', 'var123451', 34),
+    (120, 'QuantumQuotient', 'var12345', 27),
+    (121, 'ThunderTundra', 'var12346', 28),
+    (122, 'MysticMirth', 'var12347', 29),
+    (123, 'SolarSpectacle', 'var12348', 25),
+    (124, 'NebulaNurturer', 'var12349', 13),
+    (125, 'BlazeBard', 'var12343', 19),
+    (126, 'LunarLyric', 'var12342', 20),
+    (127, 'ShadowSerenade', 'var12341', 21),
+    (128, 'FrostFlame', 'war12341', 34),
+    (129, 'CyberCelestial', 'war12342', 56),
+    (130, 'VortexVivacity', 'war12343', 42),
+    (131, 'EmberElation', 'war12344', 65),
+    (132, 'NovaNectar', 'war12345', 26),
+    (133, 'FireFrost', 'war12346', 34),
+    (134, 'IceInception', 'war12347', 17),
+    (135, 'StarlightSovereign', 'war12348', 22),
+    (136, 'ElectricElysium', 'war12349', 24),
+    (137, 'RogueRhapsody', 'bar12349', 54),
+    (138, 'CosmicCrest', 'bar12348', 32),
+    (139, 'OrionOracle', 'bar12347', 23),
+    (140, 'EtherealEmber', 'bar12346', 39),
+    (141, 'ObsidianOracle', 'bar12345', 19),
+    (142, 'EnigmaticEpoch', 'bar12344', 25),
+    (143, 'NovaNemesis', 'bar12343', 41),
+    (144, 'ShadowSphinx', 'bar12342', 36),
+    (145, 'LunarLabyrinth', 'bar12341', 25),
+    (146, 'MysticMarauder', 'bar12340', 34),
+    (147, 'AstralAegis', 'nar12340', 27),
+    (148, 'PhoenixPlasma', 'nar12341', 22),
+    (149, 'SolarSynergy', 'nar12342', 24),
+    (150, 'ElementalEphemera', 'nar12343', 26),
+    (151, 'CosmicCorona', 'nar12344', 45),
+    (152, 'ZephyrZen', 'nar12345', 21),
+    (153, 'VortexVirtuoso', 'nar12346', 33),
+    (154, 'PhoenixPrelude', 'nar12347', 35),
+    (155, 'SolarSapphire', 'nar12348', 29),
+    (156, 'MysticMystique', 'nar12349', 56),
+    (157, "yeonjun's girl", 'kar12340', 62),
+    (158, 'Champion_i', 'kar12341', 14),
+    (159, 'Ninja_from_china', 'kar12342', 16),
+    (160, 'RisingStar', 'kar12343', 25),
+    (161, 'jason_todd_from_gothamcity', 'kar12344', 57),
+    (162, 'catwomen_left_from_comics', 'kar12345', 49),
+    (163, 'im_not_an_iron_man', 'kar12346', 28)
+]
+
+
+cursor1.executemany('insert into users values (?, ?, ?, ?)', users_list)
+
+for row in cursor1.execute('select * from users'):
+     print(row)
+connection1.commit()
+connection1.close()
